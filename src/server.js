@@ -1,5 +1,5 @@
 const express = require("express");
-const { ingest } = require("./ingest");
+const { ingest, stats } = require("./ingest");
 const { onPing } = require("./alerts");
 const { check } = require("./geofence");
 const { pushAlert } = require("./notify");
@@ -20,5 +20,6 @@ app.post("/pings", (req, res) => {
   const results = pings.map(handle);
   res.json(Array.isArray(req.body) ? results : results[0]);
 });
+app.get("/stats", (req, res) => res.json(stats));
 app.get("/health", (req, res) => res.json({ ok: true }));
 app.listen(process.env.PORT || 3000);

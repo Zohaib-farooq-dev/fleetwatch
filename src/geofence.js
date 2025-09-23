@@ -5,6 +5,12 @@ function addFence(id, lat, lng, radiusM) {
   fences.push({ id, lat, lng, radiusM });
 }
 
+function removeFence(id) {
+  const i = fences.findIndex((f) => f.id === id);
+  if (i >= 0) fences.splice(i, 1);
+  for (const key of [...inside.keys()]) if (key.endsWith(`:${id}`)) inside.delete(key);  // or the next ping raises a bogus exit
+}
+
 function metres(a, b) {
   const R = 6371000, toRad = (d) => (d * Math.PI) / 180;
   const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
@@ -23,4 +29,4 @@ function check(vehicleId, pos) {
   return events;
 }
 
-module.exports = { addFence, check, metres };
+module.exports = { addFence, removeFence, check, metres };

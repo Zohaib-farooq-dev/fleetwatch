@@ -1,0 +1,9 @@
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_USER: fleet, POSTGRES_PASSWORD: fleet, POSTGRES_DB: fleet }
+  api:
+    build: .
+    environment: { DATABASE_URL: postgres://fleet:fleet@db:5432/fleet }
+    ports: ["3000:3000"]
+    depends_on: [db]

@@ -5,13 +5,20 @@ const { check } = require("./geofence");
 const { pushAlert } = require("./notify");
 
 const app = express();
-app.use(express.json());
-app.post("/pings", async (req, res) => {
-  const result = ingest(req.body);
-  if (!result.stored) return res.status(202).json(result);
-  const alert = onPing(req.body);
+app.use(express.json({ limit: "1mb" }));
+
+function handle(ping) {
+  const result = ingest(ping);
+  if (!result.stored) return result;
+  const alert = onPing(ping);
   if (alert) pushAlert(alert).catch(() => {});
-  res.json({ ...result, alert, fences: check(req.body.vehicleId, req.body) });
+  return { ...result, alert, fences: check(ping.vehicleId, ping) };
+}
+
+app.post("/pings", (req, res) => {
+  const pings = Array.isArray(req.body) ? req.body : [req.body];  // firmware 2.3 batches up to 50; 2.2 still sends one
+  const results = pings.map(handle);
+  res.json(Array.isArray(req.body) ? results : results[0]);
 });
 app.get("/health", (req, res) => res.json({ ok: true }));
 app.listen(process.env.PORT || 3000);

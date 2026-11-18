@@ -1,6 +1,6 @@
 const { metres } = require("./geofence");
 
-const LIMIT_KMH = 90;
+const LIMIT_KMH = Number(process.env.SPEED_LIMIT_KMH || 90);  // Karachi highway fleet runs at 110, city vans at 90
 const MIN_MOVE_M = 20;  // GPS jitter on a parked van looks like 300 km/h over 2 seconds
 const last = new Map();
 const strikes = new Map();
